@@ -1,5 +1,5 @@
 data_dir = "/tmp/consul/server"
-
+encrypt = "p1c6tzMpKFBA5TcHaCzJWMxxU4dTreuxBGhRE/iocA8="
 server           = true
 bootstrap_expect = 1
 advertise_addr   = "{{ GetInterfaceIP `eth1` }}"
@@ -22,6 +22,7 @@ ui_config {
 
 connect {
   enabled = true
+  enable_mesh_gateway_wan_federation = true
 }
 
 datacenter = "dc1"
@@ -42,4 +43,14 @@ config_entries {
       }
     }
   ]
+}
+
+verify_incoming = true
+verify_outgoing = true
+verify_server_hostname = true
+ca_file = "/mnt/my-machine/certs/ca/consul-agent-ca.pem"
+cert_file = "/mnt/my-machine/certs/ca/dc1-server-consul-0.pem"
+key_file = "/mnt/my-machine/certs/ca/dc1-server-consul-0-key.pem"
+auto_encrypt {
+  allow_tls = true
 }

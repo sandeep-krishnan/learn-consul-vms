@@ -2,7 +2,7 @@
 
 set -o errexit
 
-VERSION="1.16.4"
+VERSION="1.23.1"
 DOWNLOAD=https://func-e.io/install.sh
 
 function install_envoy() {
