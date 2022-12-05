@@ -3,19 +3,33 @@
 #
 
 LINUX_BASE_BOX = "bento/ubuntu-18.04"
-LINUX_IP_ADDRESS = "10.199.0.200"
+LINUX_IP_ADDRESS = "192.168.56.200"
 
 Vagrant.configure(2) do |config|
 	serverName = "consul-server"
+	serverName2 = "consul-server-2"
 	databaseName = "postgres"
 	productName = "product-api"
 	publicName = "public-api"
 	frontendName = "frontend"
-	serverIP = "10.199.0.10"
-	databaseIP = "10.199.0.20"
-	productIP = "10.199.0.30"
-	publicIP = "10.199.0.40"
-	frontendIP = "10.199.0.50"
+	serverIP = "192.168.56.10"
+	serverIP2 = "192.168.56.15"
+	databaseIP = "192.168.56.20"
+	productIP = "192.168.56.30"
+	publicIP = "192.168.56.40"
+	frontendIP = "192.168.56.50"
+
+	#ingress gateway
+	ingressServerName = "ingress"
+	ingressServerIP = "192.168.56.11"
+
+	#mesh gateway
+	meshServerName = "mesh"
+	meshServerIP = "192.168.56.12"
+
+	#mesh gateway 2
+	meshServerName2 = "mesh2"
+	meshServerIP2 = "192.168.56.17"
 
 	config.vm.define serverName, autostart: true, primary: true do |vmCfg|
 		vmCfg.vm.box = LINUX_BASE_BOX
@@ -35,6 +49,75 @@ Vagrant.configure(2) do |config|
 		vmCfg.vm.provision "shell",
 			privileged: true,
 			path: './scripts/consul-server.sh',
+			args: [serverIP]
+	end
+
+	#ingress 1
+	config.vm.define ingressServerName, autostart: true, primary: false do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = ingressServerName
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP, ingressServerName, ingressServerIP)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: ingressServerIP
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+	end
+
+	#mesh 1
+	config.vm.define meshServerName, autostart: true, primary: false do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = meshServerName
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP, meshServerName, meshServerIP)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: meshServerIP
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+	end
+
+	#mesh 2
+	config.vm.define meshServerName2, autostart: true, primary: false do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = meshServerName2
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP2, meshServerName2, meshServerIP2)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: meshServerIP2
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+	end
+
+	config.vm.define serverName2, autostart: true, primary: true do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = serverName2
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configurePrometheusProvisioners(vmCfg)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: serverIP2
+			vmCfg.vm.network :forwarded_port, guest: 8500, host: 18500
+			vmCfg.vm.network :forwarded_port, guest: 9090, host: 19090
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+		vmCfg.vm.provision "shell",
+			privileged: true,
+			path: './scripts/consul-server-2.sh',
 			args: [serverIP]
 	end
 
