@@ -1,6 +1,6 @@
 // public-ingress.hcl
 Services {
-  Name = "public-mesh"
+  Name = "gateway-secondary"
   Kind = "mesh-gateway"
 
   Port = 8443
