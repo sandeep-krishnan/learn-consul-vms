@@ -4,6 +4,7 @@ CONSUL_HTTP_ADDR=${1}
 APP_NAME=${2}
 APP_IP_ADDR=${3}
 GATEWAY_NAME=${4}
+DATACENTER_NAME=${5}
 
 pushd /mnt/my-machine
 cp consul.service /etc/systemd/system/consul.service
@@ -11,6 +12,7 @@ mkdir -p /etc/consul.d
 popd
 
 sed 's/$CONSUL_HTTP_ADDR/'"${CONSUL_HTTP_ADDR}"'/g' /mnt/my-machine/consul-client.hcl > /etc/consul.d/consul.hcl
+sed -i 's/$DATACENTER_NAME/'"${DATACENTER_NAME}"'/g'   /etc/consul.d/consul.hcl
 sed 's/$GATEWAY_NAME/'"${GATEWAY_NAME}"'/g' /mnt/my-machine/services/mesh.hcl > /etc/consul.d/${APP_NAME}.hcl
 
 cat << EOF > /etc/systemd/system/consul-envoy.service

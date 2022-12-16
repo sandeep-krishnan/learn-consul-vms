@@ -7,7 +7,7 @@ bind_addr      = "0.0.0.0"
 client_addr    = "0.0.0.0"
 retry_join     = ["$CONSUL_HTTP_ADDR"]
 
-datacenter = "dc1"
+datacenter = "$DATACENTER_NAME"
 
 ports {
   grpc = 8502

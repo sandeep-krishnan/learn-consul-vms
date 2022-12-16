@@ -27,7 +27,7 @@ connect {
 
 datacenter = "dc2"
 primary_datacenter = "dc1"
-
+primary_gateways = ["$PRIMARY_GATEWAYS_ADDRESS"]
 telemetry {
   prometheus_retention_time = "24h"
   disable_hostname          = true
