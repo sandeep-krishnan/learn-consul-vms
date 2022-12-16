@@ -3,6 +3,7 @@
 CONSUL_HTTP_ADDR=${1}
 APP_NAME=${2}
 APP_IP_ADDR=${3}
+GATEWAY_NAME=${4}
 
 pushd /mnt/my-machine
 cp consul.service /etc/systemd/system/consul.service
@@ -10,7 +11,8 @@ mkdir -p /etc/consul.d
 popd
 
 sed 's/$CONSUL_HTTP_ADDR/'"${CONSUL_HTTP_ADDR}"'/g' /mnt/my-machine/consul-client.hcl > /etc/consul.d/consul.hcl
-sed 's/$IP_ADDR/'"${APP_IP_ADDR}"'/g' /mnt/my-machine/services/${APP_NAME}.hcl > /etc/consul.d/${APP_NAME}.hcl
+#}"'/g' /mnt/my-machine/services/${APP_NAME}.hcl > /etc/consul.d/${APP_NAME}.hcl
+sed 's/$GATEWAY_NAME/'"${GATEWAY_NAME}"'/g' /mnt/my-machine/services/mesh.hcl > /etc/consul.d/${APP_NAME}.hcl
 
 cat << EOF > /etc/systemd/system/consul-envoy.service
 [Unit]
@@ -18,7 +20,7 @@ Description=Consul Envoy
 After=syslog.target network.target
 
 [Service]
-ExecStart=/usr/bin/consul connect envoy -gateway=mesh -register  -expose-servers -service "gateway-primary"   -address "127.0.0.1:8443" -wan-address "${APP_IP_ADDR}:8443"
+ExecStart=/usr/bin/consul connect envoy -gateway=mesh -register  -expose-servers -service "${GATEWAY_NAME}"   -address "127.0.0.1:8443" -wan-address "${APP_IP_ADDR}:8443"
 ExecStop=/bin/sleep 5
 Restart=always
 

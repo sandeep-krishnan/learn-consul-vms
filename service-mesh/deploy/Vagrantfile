@@ -26,10 +26,12 @@ Vagrant.configure(2) do |config|
 	#mesh gateway
 	meshServerName = "mesh"
 	meshServerIP = "192.168.56.12"
+	meshName = "gateway-primary"
 
 	#mesh gateway 2
 	meshServerName2 = "mesh2"
 	meshServerIP2 = "192.168.56.17"
+	meshName = "gateway-secondary"
 
 	config.vm.define serverName, autostart: true, primary: true do |vmCfg|
 		vmCfg.vm.box = LINUX_BASE_BOX
@@ -74,7 +76,7 @@ Vagrant.configure(2) do |config|
 		vmCfg.vm.hostname = meshServerName
 		vmCfg = configureProviders(vmCfg)
 		vmCfg = configureLinuxProvisioners(vmCfg)
-		vmCfg = configureMeshGatewayProvisioners(vmCfg, serverIP, meshServerName, meshServerIP)
+		vmCfg = configureMeshGatewayProvisioners(vmCfg, serverIP, meshServerName, meshServerIP, meshName)
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: meshServerIP
@@ -90,7 +92,7 @@ Vagrant.configure(2) do |config|
 		vmCfg.vm.hostname = meshServerName2
 		vmCfg = configureProviders(vmCfg)
 		vmCfg = configureLinuxProvisioners(vmCfg)
-		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP2, meshServerName2, meshServerIP2)
+		vmCfg = configureMeshGatewayProvisioners(vmCfg, serverIP2, meshServerName2, meshServerIP2, meshName)
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: meshServerIP2
@@ -249,7 +251,7 @@ def configureIngressProvisioners(vmCfg, serverIP, appName, clientIP)
 	return vmCfg
 end
 
-def configureMeshGatewayProvisioners(vmCfg, serverIP, appName, clientIP)
+def configureMeshGatewayProvisioners(vmCfg, serverIP, appName, clientIP, meshName)
 	vmCfg.vm.provision "shell",
 		privileged: true,
 		path: './scripts/vagrant-linux-priv-envoy.sh'
@@ -257,7 +259,7 @@ def configureMeshGatewayProvisioners(vmCfg, serverIP, appName, clientIP)
 	vmCfg.vm.provision "shell",
 		privileged: true,
 		path: './scripts/consul-mesh-gateway.sh',
-		args: [serverIP, appName, clientIP]
+		args: [serverIP, appName, clientIP, meshName]
 
 	return vmCfg
 end

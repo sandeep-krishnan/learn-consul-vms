@@ -26,6 +26,7 @@ connect {
 }
 
 datacenter = "dc1"
+primary_datacenter = "dc1"
 
 telemetry {
   prometheus_retention_time = "24h"
