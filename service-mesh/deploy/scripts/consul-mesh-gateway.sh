@@ -21,7 +21,7 @@ Description=Consul Envoy
 After=syslog.target network.target
 
 [Service]
-ExecStart=/usr/bin/consul connect envoy -gateway=mesh -register  -expose-servers -service "${GATEWAY_NAME}"   -address "127.0.0.1:8443" -wan-address "${APP_IP_ADDR}:8443"
+ExecStart=/usr/bin/consul connect envoy -gateway=mesh -register  -expose-servers -service "${GATEWAY_NAME}"   -address "${APP_IP_ADDR}:8443" -wan-address "${APP_IP_ADDR}:8443"
 ExecStop=/bin/sleep 5
 Restart=always
 
