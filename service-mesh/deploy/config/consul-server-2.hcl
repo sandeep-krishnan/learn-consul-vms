@@ -25,7 +25,7 @@ connect {
   enable_mesh_gateway_wan_federation = true
 }
 
-#datacenter = "dc2"
+datacenter = "dc2"
 primary_datacenter = "dc1"
 
 telemetry {
