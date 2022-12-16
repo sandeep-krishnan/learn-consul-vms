@@ -31,7 +31,7 @@ Vagrant.configure(2) do |config|
 	#mesh gateway 2
 	meshServerName2 = "mesh2"
 	meshServerIP2 = "192.168.56.17"
-	meshName = "gateway-secondary"
+	meshName2 = "gateway-secondary"
 
 	config.vm.define serverName, autostart: true, primary: true do |vmCfg|
 		vmCfg.vm.box = LINUX_BASE_BOX

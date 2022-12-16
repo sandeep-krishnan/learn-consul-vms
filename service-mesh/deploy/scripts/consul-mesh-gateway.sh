@@ -11,7 +11,6 @@ mkdir -p /etc/consul.d
 popd
 
 sed 's/$CONSUL_HTTP_ADDR/'"${CONSUL_HTTP_ADDR}"'/g' /mnt/my-machine/consul-client.hcl > /etc/consul.d/consul.hcl
-#}"'/g' /mnt/my-machine/services/${APP_NAME}.hcl > /etc/consul.d/${APP_NAME}.hcl
 sed 's/$GATEWAY_NAME/'"${GATEWAY_NAME}"'/g' /mnt/my-machine/services/mesh.hcl > /etc/consul.d/${APP_NAME}.hcl
 
 cat << EOF > /etc/systemd/system/consul-envoy.service
