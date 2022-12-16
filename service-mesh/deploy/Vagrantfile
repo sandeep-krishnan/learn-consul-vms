@@ -92,7 +92,7 @@ Vagrant.configure(2) do |config|
 		vmCfg.vm.hostname = meshServerName2
 		vmCfg = configureProviders(vmCfg)
 		vmCfg = configureLinuxProvisioners(vmCfg)
-		vmCfg = configureMeshGatewayProvisioners(vmCfg, serverIP2, meshServerName2, meshServerIP2, meshName)
+		vmCfg = configureMeshGatewayProvisioners(vmCfg, serverIP2, meshServerName2, meshServerIP2, meshName2)
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: meshServerIP2
