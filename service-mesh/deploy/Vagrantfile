@@ -15,15 +15,23 @@ Vagrant.configure(2) do |config|
 	publicName = "public-api"
 	frontendName = "frontend"
 	serverIP = "192.168.56.10"
-	serverIP2 = "192.168.56.15"
+	serverIP2 = "192.168.56.110"
 	databaseIP = "192.168.56.20"
 	productIP = "192.168.56.30"
 	publicIP = "192.168.56.40"
 	frontendIP = "192.168.56.50"
 
+	#cart
+	cartIp = "192.168.56.60"
+	cartName = "cart"
+
+	#order
+	orderIp = "192.168.56.65"
+	orderName = "order"
+
 	#ingress gateway
 	ingressServerName = "ingress"
-	ingressServerIP = "192.168.56.11"
+	ingressServerIP = "192.168.56.15"
 
 	#mesh gateway
 	meshServerName = "mesh"
@@ -32,7 +40,7 @@ Vagrant.configure(2) do |config|
 
 	#mesh gateway 2
 	meshServerName2 = "mesh2"
-	meshServerIP2 = "192.168.56.17"
+	meshServerIP2 = "192.168.56.112"
 	meshName2 = "gateway-secondary"
 
 	config.vm.define serverName, autostart: true, primary: true do |vmCfg|
@@ -44,6 +52,7 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: serverIP
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
 			vmCfg.vm.network :forwarded_port, guest: 8500, host: 8500
 			vmCfg.vm.network :forwarded_port, guest: 9090, host: 9090
 		end
@@ -66,6 +75,7 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: ingressServerIP
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
 		end
 
 		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
@@ -82,6 +92,7 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: meshServerIP
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
 		end
 
 		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
@@ -98,12 +109,14 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: meshServerIP2
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
 		end
 
 		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
 
 	end
 
+	#consul 2
 	config.vm.define serverName2, autostart: true, primary: true do |vmCfg|
 		vmCfg.vm.box = LINUX_BASE_BOX
 		vmCfg.vm.hostname = serverName2
@@ -113,6 +126,7 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provider "virtualbox" do |_|
 			vmCfg.vm.network :private_network, ip: serverIP2
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
 			vmCfg.vm.network :forwarded_port, guest: 8500, host: 18500
 			vmCfg.vm.network :forwarded_port, guest: 9090, host: 19090
 		end
@@ -125,6 +139,49 @@ Vagrant.configure(2) do |config|
 			args: [serverIP, meshServerIP + ":8443"]
 	end
 
+	#cart
+	config.vm.define cartName, autostart: true, primary: false do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = cartName
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP, cartName, cartIp, dcPrimary)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: cartIp
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+		vmCfg.vm.provision "shell",
+			privileged: true,
+			path: './scripts/fake-service.sh',
+			args: [cartName]
+	end
+
+	#order
+	config.vm.define orderName, autostart: true, primary: false do |vmCfg|
+		vmCfg.vm.box = LINUX_BASE_BOX
+		vmCfg.vm.hostname = orderName
+		vmCfg = configureProviders(vmCfg)
+		vmCfg = configureLinuxProvisioners(vmCfg)
+		vmCfg = configureConsulClientProvisioners(vmCfg, serverIP, orderName, orderIp, dcPrimary)
+
+		vmCfg.vm.provider "virtualbox" do |_|
+			vmCfg.vm.network :private_network, ip: orderIp
+			vmCfg.vm.network :forwarded_port, guest: 22, host: 2222, disabled: true
+		end
+
+		vmCfg.vm.synced_folder './config', '/mnt/my-machine'
+
+		vmCfg.vm.provision "shell",
+			privileged: true,
+			path: './scripts/fake-service.sh',
+			args: [orderName]
+	end
+
+	#database
 	config.vm.define databaseName, autostart: true, primary: false do |vmCfg|
 		vmCfg.vm.box = LINUX_BASE_BOX
 		vmCfg.vm.hostname = databaseName
@@ -140,7 +197,7 @@ Vagrant.configure(2) do |config|
 
 		vmCfg.vm.provision "shell",
 			privileged: true,
-			path: './scripts/postgresql.sh'
+			path: './scripts/fake-service.sh'
 	end
 
 	config.vm.define productName, autostart: true, primary: false do |vmCfg|
