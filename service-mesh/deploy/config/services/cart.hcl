@@ -24,6 +24,14 @@ services {
         interval = "10s"
       }
       proxy {
+        upstreams {
+          destination_name   = "order"
+          local_bind_address = "127.0.0.1"
+          local_bind_port    = 10000
+          config {
+            protocol = "http"
+          }
+        }
         config {
           protocol                   = "http"
           envoy_prometheus_bind_addr = "0.0.0.0:9102"
