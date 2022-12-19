@@ -5,7 +5,7 @@ services {
     "hashicups"
   ]
   address = "$IP_ADDR"
-  port    = 80
+  port    = 9090
   checks = [
     {
       id       = "http"
