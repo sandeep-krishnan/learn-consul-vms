@@ -12,12 +12,12 @@ website.
 
 ## How to?
 ### Bootstrap  
-cd service-mesh/deploy/scripts   
+> cd service-mesh/deploy/scripts   
 #### Bring up the Consul & Mesh Gateways in dc1 & dc2
-vagrant up consul-server mesh consul-server-2 mesh2   
+> vagrant up consul-server mesh consul-server-2 mesh2   
 
 #### Bring up the cart & order services 
-vagrant up cart order order2     
+> vagrant up cart order order2     
 
 ### Testing
 #### WAN Federation
