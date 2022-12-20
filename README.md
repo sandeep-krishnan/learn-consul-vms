@@ -4,8 +4,8 @@ This repository is derived from [HashiCorp Learn](https://github.com/hashicorp/l
 website.
 
 # How to?
-cd service-mesh/deploy/scripts 
-vagrant up consul-server mesh consul-server-2 mesh2 cart order order2 
+cd service-mesh/deploy/scripts   
+vagrant up consul-server mesh consul-server-2 mesh2 cart order order2   
 
 
 # Features
